@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 // require('dotenv').config();
+import readline from 'readline';
+import fs from 'fs';
 
 // create instances
 const app = express();
@@ -15,15 +17,39 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Enable CORS
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CORS_ORIGIN,
+//   })
+// );
 
 // Test route
 router.get('/test', (req, res) => {
   res.send('The weather api is working!');
+});
+
+router.get('/temperatures', async (req, res) => {
+  const rl = readline.createInterface({
+    input: fs.createReadStream(
+      '/Users/Frank/Google Drive/Coding/Dev _Tests/Coates_Group/sydney-temperatures.csv',
+      'utf8'
+    ),
+    crlfDelay: Infinity,
+  });
+
+  let result = [];
+
+  const compile = async () => {
+    for await (const line of rl) {
+      const lineArray = line.split(',');
+      result.push(lineArray);
+    }
+  };
+
+  await compile();
+  result.shift();
+  console.log(result);
+  res.send(result);
 });
 
 // Use our router configuration when we call /api
