@@ -1,7 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-// require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 import readline from 'readline';
 import fs from 'fs';
 
@@ -9,19 +10,18 @@ import fs from 'fs';
 const app = express();
 const router = express.Router();
 
-// const PORT = process.env.PORT || 3001;
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // configure the API to use bodyParser and look for JSON data in the request body
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Enable CORS
-// app.use(
-//   cors({
-//     origin: process.env.CORS_ORIGIN,
-//   })
-// );
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+  })
+);
 
 // Test route
 router.get('/test', (req, res) => {
@@ -42,13 +42,22 @@ router.get('/temperatures', async (req, res) => {
   const compile = async () => {
     for await (const line of rl) {
       const lineArray = line.split(',');
-      result.push(lineArray);
+      let singleObj = {};
+      const obj = lineArray.map((item, index) => {
+        if (index === 0) {
+          singleObj['date'] = item;
+        } else if (index === 1) {
+          singleObj['max'] = item;
+        } else {
+          singleObj['min'] = item;
+        }
+      });
+      result.push(singleObj);
     }
   };
 
   await compile();
   result.shift();
-  console.log(result);
   res.send(result);
 });
 
