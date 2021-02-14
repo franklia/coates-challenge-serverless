@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import readline from 'readline';
 import fs from 'fs';
+import path from 'path';
 
 // create instances
 const app = express();
@@ -28,12 +29,10 @@ router.get('/test', (req, res) => {
   res.send('The weather api is working!');
 });
 
+// GET array of temperature objects for 10 days from csv file
 router.get('/temperatures', async (req, res) => {
   const rl = readline.createInterface({
-    input: fs.createReadStream(
-      '/Users/Frank/Google Drive/Coding/Dev _Tests/Coates_Group/sydney-temperatures.csv',
-      'utf8'
-    ),
+    input: fs.createReadStream(`${process.env.LOCAL_PATH}/src/sydney-temperatures.csv`, 'utf8'),
     crlfDelay: Infinity,
   });
 
